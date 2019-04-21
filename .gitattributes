@@ -1,0 +1,2 @@
+# Header files are detected as C++ headers. Let's fix this.
+*.h linguist-language=C
