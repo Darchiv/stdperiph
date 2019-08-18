@@ -58,29 +58,28 @@ chip_to_stdperiphdef(${STDPERIPH_TARGET} SERIES STDPERIPHDEF)
 target_compile_definitions(stdperiph PUBLIC ${STDPERIPHDEF})
 
 if(SERIES STREQUAL "F0")
-	target_include_directories(stdperiph PRIVATE
-		CMSIS/Include
-		CMSIS/Device/ST/STM32F0xx/Include
-	)
-
-	add_subdirectory(STM32F0xx_StdPeriph_Driver/)
+	set(SERIES_DIRECTORY "STM32F0xx")
 
 elseif(SERIES STREQUAL "F1")
-	target_include_directories(stdperiph PRIVATE
-		CMSIS/Include
-		CMSIS/Device/ST/STM32F10x/Include
-	)
-
-	add_subdirectory(STM32F10x_StdPeriph_Driver/)
+	set(SERIES_DIRECTORY "STM32F10x")
 
 elseif(SERIES STREQUAL "L1")
-	target_include_directories(stdperiph PRIVATE
-		CMSIS/Include
-		CMSIS/Device/ST/STM32L1xx/Include
-	)
-
-	add_subdirectory(STM32L1xx_StdPeriph_Driver/)
+	set(SERIES_DIRECTORY "STM32L1xx")
 
 else()
 	message(FATAL_ERROR "Internal error. '" ${SERIES} "' series not handled.")
 endif()
+
+target_include_directories(stdperiph PRIVATE
+	CMSIS/Include/
+	CMSIS/Device/ST/${SERIES_DIRECTORY}/Include/
+)
+
+# The common headers are included by the series-specific headers (those
+# providing a public API) and so they all must be "exported" together.
+target_include_directories(stdperiph SYSTEM INTERFACE
+	CMSIS/Include/
+	CMSIS/Device/ST/${SERIES_DIRECTORY}/Include/
+)
+
+add_subdirectory(${SERIES_DIRECTORY}_StdPeriph_Driver/)
